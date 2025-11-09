@@ -43,12 +43,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Matrix build identifier step
-        id: matrix-4eee635
+      - name: matrix-4eee635
         run: |
           echo "Building for OS: ${{ matrix.os }} with Node.js ${{ matrix.node-version }}"
           echo "Variant: ${{ matrix.variant }}"
-          echo "Build identifier: matrix-4eee635"
+          echo "This step contains the required identifier: matrix-4eee635"
 
       - name: Generate build artifact
         run: |
