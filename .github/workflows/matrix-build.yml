@@ -1,0 +1,88 @@
+name: Matrix Build with Artifacts
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  matrix-build:
+    name: Build (${{ matrix.os }}-${{ matrix.node-version }})
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node-version: 18
+            variant: ubuntu-node18
+          - os: ubuntu-latest
+            node-version: 20
+            variant: ubuntu-node20
+          - os: macos-latest
+            node-version: 18
+            variant: macos-node18
+          - os: windows-latest
+            node-version: 20
+            variant: windows-node20
+          - os: ubuntu-latest
+            node-version: 21
+            variant: ubuntu-node21
+          - os: windows-latest
+            node-version: 21
+            variant: windows-node21
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Matrix build identifier step
+        id: matrix-4eee635
+        run: |
+          echo "Building for OS: ${{ matrix.os }} with Node.js ${{ matrix.node-version }}"
+          echo "Variant: ${{ matrix.variant }}"
+          echo "Build identifier: matrix-4eee635"
+
+      - name: Generate build artifact
+        run: |
+          # Create a unique build artifact with meaningful content
+          echo "Build Information:" > build-output.txt
+          echo "OS: ${{ matrix.os }}" >> build-output.txt
+          echo "Node.js Version: ${{ matrix.node-version }}" >> build-output.txt
+          echo "Variant: ${{ matrix.variant }}" >> build-output.txt
+          echo "Build Timestamp: $(date)" >> build-output.txt
+          echo "Repository: ${{ github.repository }}" >> build-output.txt
+          echo "Commit SHA: ${{ github.sha }}" >> build-output.txt
+          echo "" >> build-output.txt
+          echo "Build successful! All dependencies resolved." >> build-output.txt
+          
+          # Add some simulated build output
+          echo "Compiled assets:" >> build-output.txt
+          echo "- app.js (built for ${{ matrix.os }})" >> build-output.txt
+          echo "- styles.css" >> build-output.txt
+          echo "- index.html" >> build-output.txt
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-4eee635-${{ matrix.variant }}
+          path: build-output.txt
+          retention-days: 7
+
+  summary:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: matrix-build
+    steps:
+      - name: Display build completion
+        run: |
+          echo "✅ Matrix build completed successfully!"
+          echo "📦 Artifacts uploaded for all variants"
+          echo "🔧 Check the Actions tab to download artifacts"
